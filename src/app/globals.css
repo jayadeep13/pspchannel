@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand palette — drawn from the PSP Channel mark */
+  --color-navy: #0a1832;
+  --color-navy-deep: #060f22;
+  --color-navy-panel: #10233f;
+  --color-navy-line: #1c3358;
+  --color-broadcast: #d4161e;
+  --color-broadcast-dim: #8f1015;
+  --color-signal: #f0a93d;
+  --color-signal-soft: #f7d9a4;
+  --color-paper: #f3f4f7;
+  --color-paper-dim: #e6e8ee;
+  --color-ink: #0b1220;
+  --color-ink-soft: #4a5468;
+
+  --font-display: "Anton", "Arial Narrow", sans-serif;
+  --font-heading: "Archivo", "Arial", sans-serif;
+  --font-body: "Inter", "Helvetica", sans-serif;
+  --font-mono: "IBM Plex Mono", "Courier New", monospace;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-serif-body: "PT Serif", Georgia, serif;
+
+  --animate-blink: blink 1.4s steps(1, end) infinite;
+  --animate-marquee: marquee 32s linear infinite;
+  --animate-marquee-fast: marquee 18s linear infinite;
+  --animate-scan: scan 6s linear infinite;
+}
+
+@keyframes blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+html {
+  background: var(--color-paper);
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-signal);
+  color: var(--color-navy-deep);
+}
+
+/* Utility: broadcast-style viewfinder corner brackets, the signature motif */
+.viewfinder {
+  position: relative;
+}
+.viewfinder::before,
+.viewfinder::after,
+.viewfinder > .vf-tr,
+.viewfinder > .vf-bl {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  z-index: 20;
+  pointer-events: none;
+}
+.viewfinder::before {
+  top: -1px;
+  left: -1px;
+  border-top: 3px solid var(--color-signal);
+  border-left: 3px solid var(--color-signal);
+}
+.viewfinder::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 3px solid var(--color-signal);
+  border-right: 3px solid var(--color-signal);
+}
+.viewfinder > .vf-tr {
+  top: -1px;
+  right: -1px;
+  border-top: 3px solid var(--color-signal);
+  border-right: 3px solid var(--color-signal);
+}
+.viewfinder > .vf-bl {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 3px solid var(--color-signal);
+  border-left: 3px solid var(--color-signal);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.bg-grid {
+  background-image: linear-gradient(
+      to right,
+      rgba(240, 169, 61, 0.06) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(240, 169, 61, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
