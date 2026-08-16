@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import AdminLoginForm from "@/components/admin/AdminLoginForm";
+import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 import AdminTickerForm from "@/components/admin/AdminTickerForm";
 import AdminInterviewsManager from "@/components/admin/AdminInterviewsManager";
 import AdminPostsManager from "@/components/admin/AdminPostsManager";
 import AdminNewsletterManager from "@/components/admin/AdminNewsletterManager";
 import AdminUpdatesManager from "@/components/admin/AdminUpdatesManager";
+import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
 import { getTickerText } from "@/lib/ticker-store";
 import { getInterviews } from "@/lib/interviews-store";
 import { getPosts } from "@/lib/posts-store";
@@ -16,6 +20,17 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
+  const cookieStore = await cookies();
+  const signedIn = verifySessionToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
+
+  if (!signedIn) {
+    return (
+      <main className="min-h-screen bg-navy px-5 py-16 lg:px-10">
+        <AdminLoginForm />
+      </main>
+    );
+  }
+
   const [currentText, interviews, posts, subscribers, updates] = await Promise.all([
     getTickerText(),
     getInterviews(),
@@ -27,9 +42,12 @@ export default async function AdminPage() {
   return (
     <main className="min-h-screen bg-navy px-5 py-16 lg:px-10">
       <div className="mx-auto max-w-3xl space-y-16">
-        <p className="font-mono text-[11px] font-bold tracking-[0.25em] text-broadcast">
-          ADMIN
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="font-mono text-[11px] font-bold tracking-[0.25em] text-broadcast">
+            ADMIN
+          </p>
+          <AdminLogoutButton />
+        </div>
         <h1 className="sr-only">PSP Channel Admin</h1>
 
         <section>
@@ -80,8 +98,7 @@ export default async function AdminPage() {
             Newsletter Subscribers
           </h2>
           <p className="mt-3 max-w-lg text-sm leading-relaxed text-ink-soft">
-            Everyone who signed up on /newsletter. Enter the admin password
-            to remove a subscriber.
+            Everyone who signed up on /newsletter.
           </p>
 
           <div className="mt-10 border border-navy-line bg-navy-deep/60 p-6">

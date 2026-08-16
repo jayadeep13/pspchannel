@@ -1,27 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
-import { passwordMatches } from "@/lib/admin-auth";
+import { isAuthenticated } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  if (!isAuthenticated(request)) {
+    return NextResponse.json({ error: "Not signed in." }, { status: 401 });
+  }
+
   const formData = await request.formData().catch(() => null);
   if (!formData) {
     return NextResponse.json({ error: "Invalid form data." }, { status: 400 });
   }
 
-  const password = String(formData.get("password") ?? "");
   const file = formData.get("file");
 
-  if (!process.env.ADMIN_PASSWORD) {
-    return NextResponse.json(
-      { error: "Admin password isn't configured on the server." },
-      { status: 500 }
-    );
-  }
-  if (!passwordMatches(password)) {
-    return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
-  }
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "No image file provided." }, { status: 400 });
   }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { passwordMatches } from "@/lib/admin-auth";
+import { isAuthenticated } from "@/lib/admin-auth";
 import { addSubscriber, removeSubscriber } from "@/lib/newsletter-store";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,11 +26,10 @@ export async function POST(request: NextRequest) {
 // Admin-only: remove a subscriber.
 export async function DELETE(request: NextRequest) {
   const body = await request.json().catch(() => null);
-  const password = typeof body?.password === "string" ? body.password : "";
   const email = typeof body?.email === "string" ? body.email : "";
 
-  if (!process.env.ADMIN_PASSWORD || !passwordMatches(password)) {
-    return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
+  if (!isAuthenticated(request)) {
+    return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
   if (!email) {
     return NextResponse.json({ error: "Missing email." }, { status: 400 });

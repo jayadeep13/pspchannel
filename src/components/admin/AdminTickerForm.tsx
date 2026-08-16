@@ -10,7 +10,6 @@ export default function AdminTickerForm({
 }: {
   initialText: string;
 }) {
-  const [password, setPassword] = useState("");
   const [text, setText] = useState(initialText);
   const [status, setStatus] = useState<Status>({ type: "idle" });
 
@@ -20,7 +19,7 @@ export default function AdminTickerForm({
       const res = await fetch("/api/ticker", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, text: nextText }),
+        body: JSON.stringify({ text: nextText }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -47,25 +46,6 @@ export default function AdminTickerForm({
       }}
       className="space-y-6"
     >
-      <div>
-        <label
-          htmlFor="password"
-          className="mb-2 block font-mono text-[11px] font-bold tracking-[0.2em] text-ink-soft"
-        >
-          ADMIN PASSWORD
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="current-password"
-          className="w-full border border-navy-line bg-navy-panel px-4 py-3 font-mono text-sm text-paper outline-none transition-colors focus:border-broadcast"
-          placeholder="••••••••"
-        />
-      </div>
-
       <div>
         <label
           htmlFor="ticker-text"

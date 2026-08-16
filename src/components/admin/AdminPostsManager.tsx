@@ -13,7 +13,6 @@ export default function AdminPostsManager({
   initialPosts: Post[];
 }) {
   const [posts, setPosts] = useState(initialPosts);
-  const [password, setPassword] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [caption, setCaption] = useState("");
   const [status, setStatus] = useState<Status>({ type: "idle" });
@@ -26,7 +25,7 @@ export default function AdminPostsManager({
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, imageUrl, caption }),
+        body: JSON.stringify({ imageUrl, caption }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -48,7 +47,7 @@ export default function AdminPostsManager({
       const res = await fetch("/api/posts", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, id }),
+        body: JSON.stringify({ id }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -69,22 +68,6 @@ export default function AdminPostsManager({
   return (
     <div className="space-y-8">
       <form onSubmit={submit} className="space-y-5">
-        <div>
-          <label htmlFor="post-password" className={labelClass}>
-            ADMIN PASSWORD
-          </label>
-          <input
-            id="post-password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-            className={inputClass}
-            placeholder="••••••••"
-          />
-        </div>
-
         <div>
           <label className={labelClass}>IMAGE URL</label>
           <div className="flex gap-2">
@@ -177,7 +160,6 @@ export default function AdminPostsManager({
 
       {showUploadModal && (
         <ImageUploadModal
-          password={password}
           onClose={() => setShowUploadModal(false)}
           onUploaded={(url) => {
             setImageUrl(url);

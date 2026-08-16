@@ -27,7 +27,6 @@ export default function AdminInterviewsManager({
   initialInterviews: Interview[];
 }) {
   const [interviews, setInterviews] = useState(initialInterviews);
-  const [password, setPassword] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState<Status>({ type: "idle" });
 
@@ -57,7 +56,6 @@ export default function AdminInterviewsManager({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          password,
           interview: {
             ...form,
             slug: form.slug || undefined,
@@ -87,7 +85,7 @@ export default function AdminInterviewsManager({
       const res = await fetch("/api/interviews", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, slug }),
+        body: JSON.stringify({ slug }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -108,22 +106,6 @@ export default function AdminInterviewsManager({
   return (
     <div className="space-y-8">
       <form onSubmit={save} className="space-y-5">
-        <div>
-          <label htmlFor="interview-password" className={labelClass}>
-            ADMIN PASSWORD
-          </label>
-          <input
-            id="interview-password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-            className={inputClass}
-            placeholder="••••••••"
-          />
-        </div>
-
         {form.slug && (
           <div className="flex items-center justify-between border border-signal/40 bg-signal-soft/10 px-3 py-2 text-xs text-signal">
             <span>Editing &ldquo;{form.title}&rdquo;</span>

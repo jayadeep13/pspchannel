@@ -4,11 +4,9 @@ import { useState } from "react";
 import { Loader2, Upload, X } from "lucide-react";
 
 export default function ImageUploadModal({
-  password,
   onClose,
   onUploaded,
 }: {
-  password: string;
   onClose: () => void;
   onUploaded: (url: string) => void;
 }) {
@@ -25,16 +23,11 @@ export default function ImageUploadModal({
 
   async function upload() {
     if (!file) return;
-    if (!password) {
-      setError("Enter the admin password in the form first.");
-      return;
-    }
     setUploading(true);
     setError("");
     try {
       const body = new FormData();
       body.append("file", file);
-      body.append("password", password);
       const res = await fetch("/api/upload", { method: "POST", body });
       const data = await res.json();
       if (!res.ok) {

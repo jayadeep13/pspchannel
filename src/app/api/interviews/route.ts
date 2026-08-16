@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { passwordMatches } from "@/lib/admin-auth";
+import { isAuthenticated } from "@/lib/admin-auth";
 import { getInterviews, saveInterview, deleteInterview } from "@/lib/interviews-store";
 import type { Interview } from "@/lib/site-config";
 
@@ -10,17 +10,10 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
-  const password = typeof body?.password === "string" ? body.password : "";
   const interview = body?.interview as Partial<Interview> | undefined;
 
-  if (!process.env.ADMIN_PASSWORD) {
-    return NextResponse.json(
-      { error: "Admin password isn't configured on the server." },
-      { status: 500 }
-    );
-  }
-  if (!passwordMatches(password)) {
-    return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
+  if (!isAuthenticated(request)) {
+    return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
   if (!interview?.title || !interview?.occupation || !interview?.status || !interview?.episode) {
     return NextResponse.json(
@@ -53,17 +46,10 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const body = await request.json().catch(() => null);
-  const password = typeof body?.password === "string" ? body.password : "";
   const slug = typeof body?.slug === "string" ? body.slug : "";
 
-  if (!process.env.ADMIN_PASSWORD) {
-    return NextResponse.json(
-      { error: "Admin password isn't configured on the server." },
-      { status: 500 }
-    );
-  }
-  if (!passwordMatches(password)) {
-    return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
+  if (!isAuthenticated(request)) {
+    return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
   if (!slug) {
     return NextResponse.json({ error: "Missing slug." }, { status: 400 });

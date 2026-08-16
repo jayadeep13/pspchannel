@@ -13,7 +13,6 @@ export default function AdminUpdatesManager({
   initialUpdates: UpdatePost[];
 }) {
   const [updates, setUpdates] = useState(initialUpdates);
-  const [password, setPassword] = useState("");
   const [topic, setTopic] = useState("");
   const [body, setBody] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -27,7 +26,7 @@ export default function AdminUpdatesManager({
       const res = await fetch("/api/updates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, topic, body, imageUrl }),
+        body: JSON.stringify({ topic, body, imageUrl }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -50,7 +49,7 @@ export default function AdminUpdatesManager({
       const res = await fetch("/api/updates", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, id }),
+        body: JSON.stringify({ id }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -71,22 +70,6 @@ export default function AdminUpdatesManager({
   return (
     <div className="space-y-8">
       <form onSubmit={submit} className="space-y-5">
-        <div>
-          <label htmlFor="update-password" className={labelClass}>
-            ADMIN PASSWORD
-          </label>
-          <input
-            id="update-password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-            className={inputClass}
-            placeholder="••••••••"
-          />
-        </div>
-
         <div>
           <label className={labelClass}>HEADLINE</label>
           <input
@@ -197,7 +180,6 @@ export default function AdminUpdatesManager({
 
       {showUploadModal && (
         <ImageUploadModal
-          password={password}
           onClose={() => setShowUploadModal(false)}
           onUploaded={(url) => {
             setImageUrl(url);

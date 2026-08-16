@@ -12,7 +12,6 @@ export default function AdminNewsletterManager({
   initialSubscribers: Subscriber[];
 }) {
   const [subscribers, setSubscribers] = useState(initialSubscribers);
-  const [password, setPassword] = useState("");
   const [status, setStatus] = useState<Status>({ type: "idle" });
 
   async function remove(email: string) {
@@ -21,7 +20,7 @@ export default function AdminNewsletterManager({
       const res = await fetch("/api/newsletter", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, email }),
+        body: JSON.stringify({ email }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -37,21 +36,6 @@ export default function AdminNewsletterManager({
 
   return (
     <div className="space-y-6">
-      <div>
-        <label htmlFor="newsletter-password" className="mb-1.5 block font-mono text-[10px] font-bold tracking-[0.2em] text-ink-soft">
-          ADMIN PASSWORD
-        </label>
-        <input
-          id="newsletter-password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          className="w-full max-w-xs border border-navy-line bg-navy-panel px-3 py-2.5 font-mono text-sm text-paper outline-none transition-colors focus:border-broadcast"
-          placeholder="•••••••• (required to remove subscribers)"
-        />
-      </div>
-
       <div>
         <p className="mb-1.5 font-mono text-[10px] font-bold tracking-[0.2em] text-ink-soft">
           SUBSCRIBERS ({subscribers.length})
