@@ -20,8 +20,8 @@ export const metadata: Metadata = {
 };
 
 const heroImages = [
-  "/images/golla.jfif",
-  "/images/lokes.jfif",
+  "/images/golla.jpg",
+  "/images/lokes.jpg",
   "/images/sharmila.webp",
   "/images/tulasi.jpg",
 ];

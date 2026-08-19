@@ -108,7 +108,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-navy-line pt-6 text-xs text-ink-soft md:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-navy-line pt-6 text-xs text-ink-soft md:flex-row">
           <p>
             &copy; {new Date().getFullYear()} {siteConfig.name}. All rights
             reserved.
@@ -116,6 +116,22 @@ export default function Footer() {
           <p className="font-mono tracking-wide">
             Founded by {siteConfig.founder.name}
           </p>
+          <a
+            href="https://www.pandjtechnologies.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-ink-soft transition-colors hover:text-signal"
+          >
+            Designed &amp; Developed By
+            <Image
+              src="/images/p&jlogo.png"
+              alt="P & J Technologies"
+              width={20}
+              height={20}
+              className="h-5 w-5 shrink-0 object-contain"
+            />
+            <span className="font-semibold text-paper/90">P &amp; J Technologies</span>
+          </a>
         </div>
       </div>
     </footer>
