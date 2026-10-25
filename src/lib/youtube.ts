@@ -20,10 +20,9 @@ type YoutubeSnippetItem = {
     resourceId?: { videoId?: string };
     title?: string;
     publishedAt?: string;
-    thumbnails?: {
-      medium?: { url?: string };
-      default?: { url?: string };
-    };
+    thumbnails?: Partial<
+      Record<"maxres" | "standard" | "high" | "medium" | "default", { url?: string }>
+    >;
   };
 };
 
@@ -82,6 +81,18 @@ async function getUploadsPlaylistId(config: YoutubeConfig): Promise<string | nul
   return typeof id === "string" ? id : null;
 }
 
+// Largest first: Shorts cards crop a 16:9 thumbnail to 9:16, so small
+// sizes (medium is 320x180) end up stretched and blurry.
+function bestThumbnail(
+  thumbnails: NonNullable<YoutubeSnippetItem["snippet"]>["thumbnails"]
+): string {
+  for (const size of ["maxres", "standard", "high", "medium", "default"] as const) {
+    const url = thumbnails?.[size]?.url;
+    if (url) return url;
+  }
+  return "";
+}
+
 function snippetItemsToVideos(items: YoutubeSnippetItem[]): YoutubeVideo[] {
   const videos: YoutubeVideo[] = [];
   for (const item of items) {
@@ -91,10 +102,7 @@ function snippetItemsToVideos(items: YoutubeSnippetItem[]): YoutubeVideo[] {
       id: videoId,
       title: item.snippet?.title ?? "Untitled",
       publishedAt: item.snippet?.publishedAt ?? "",
-      thumbnail:
-        item.snippet?.thumbnails?.medium?.url ??
-        item.snippet?.thumbnails?.default?.url ??
-        "",
+      thumbnail: bestThumbnail(item.snippet?.thumbnails),
     });
   }
   return videos;
