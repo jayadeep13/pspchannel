@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Reveal from "./Reveal";
 import InterviewCard from "./InterviewCard";
-import { getInterviews } from "@/lib/interviews-store";
+import { getArchiveInterviews } from "@/lib/interviews-store";
 
 export default async function InterviewsSection() {
-  const interviews = (await getInterviews()).slice(0, 4);
+  const interviews = (await getArchiveInterviews()).slice(0, 4);
 
   return (
     <section className="bg-paper-dim py-20 lg:py-28">

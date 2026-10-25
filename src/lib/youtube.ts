@@ -125,17 +125,17 @@ function parseIsoDurationSeconds(iso: string): number {
   return hours * 3600 + minutes * 60 + seconds;
 }
 
-// YouTube's public API has no "is this a Short" flag, so this uses the
-// documented Shorts length cap (<=3 min) against this channel's own upload
-// durations as the closest available signal.
-export async function getShorts(maxResults = 12): Promise<YoutubeVideo[]> {
+type TimedVideo = YoutubeVideo & { durationSeconds: number };
+
+// Recent uploads with their lengths, shared by the Shorts and episode lists.
+async function getRecentUploadsWithDurations(): Promise<TimedVideo[]> {
   const config = getConfig();
   if (!config) return [];
 
   const playlistId = await getUploadsPlaylistId(config);
   if (!playlistId) return [];
 
-  // Pull a larger recent window since only some of these will qualify.
+  // Pull a larger recent window since callers keep only some of these.
   const data = await youtubeGet(
     "playlistItems",
     { part: "snippet", playlistId, maxResults: "50" },
@@ -160,7 +160,40 @@ export async function getShorts(maxResults = 12): Promise<YoutubeVideo[]> {
     }
   }
 
-  return candidates
-    .filter((c) => (durationById.get(c.id) ?? Infinity) <= 180)
+  return candidates.map((c) => ({
+    ...c,
+    durationSeconds: durationById.get(c.id) ?? Infinity,
+  }));
+}
+
+// YouTube's public API has no "is this a Short" flag, so this uses the
+// documented Shorts length cap (<=3 min) against this channel's own upload
+// durations as the closest available signal.
+const SHORTS_MAX_SECONDS = 180;
+
+export async function getShorts(maxResults = 12): Promise<YoutubeVideo[]> {
+  const uploads = await getRecentUploadsWithDurations();
+  return uploads
+    .filter((v) => v.durationSeconds <= SHORTS_MAX_SECONDS)
     .slice(0, maxResults);
+}
+
+export type YoutubeEpisode = YoutubeVideo & { duration: string };
+
+function formatDuration(totalSeconds: number): string {
+  if (!Number.isFinite(totalSeconds)) return "";
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = Math.floor(totalSeconds % 60);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+}
+
+// Full-length uploads (everything that isn't a Short).
+export async function getEpisodes(maxResults = 24): Promise<YoutubeEpisode[]> {
+  const uploads = await getRecentUploadsWithDurations();
+  return uploads
+    .filter((v) => v.durationSeconds > SHORTS_MAX_SECONDS)
+    .slice(0, maxResults)
+    .map(({ durationSeconds, ...v }) => ({ ...v, duration: formatDuration(durationSeconds) }));
 }

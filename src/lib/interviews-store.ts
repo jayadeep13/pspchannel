@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import type { Interview } from "./site-config";
+import { getEpisodes } from "./youtube";
 
 const INTERVIEWS_KEY = "psp:interviews";
 
@@ -27,6 +28,38 @@ export async function getInterviews(): Promise<Interview[]> {
   } catch {
     return [];
   }
+}
+
+// Interviews curated in /admin come first, followed by the channel's
+// full-length YouTube uploads that aren't already linked to one of them.
+export async function getArchiveInterviews(): Promise<Interview[]> {
+  const [curated, episodes] = await Promise.all([getInterviews(), getEpisodes()]);
+  const linked = new Set(curated.map((i) => i.youtubeId).filter(Boolean));
+
+  const fromYoutube: Interview[] = episodes
+    .filter((v) => !linked.has(v.id))
+    .map((v) => ({
+      slug: `yt-${v.id}`,
+      title: v.title,
+      subject: v.publishedAt
+        ? new Date(v.publishedAt).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })
+        : "",
+      occupation: "Other",
+      location: "",
+      status: "published",
+      episode: "",
+      duration: v.duration,
+      date: v.publishedAt,
+      synopsis: "",
+      youtubeId: v.id,
+      thumbnail: v.thumbnail,
+    }));
+
+  return [...curated, ...fromYoutube];
 }
 
 export async function saveInterview(

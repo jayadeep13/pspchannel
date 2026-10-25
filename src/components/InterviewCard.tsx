@@ -4,9 +4,13 @@ import type { Interview } from "@/lib/site-config";
 
 export default function InterviewCard({ interview }: { interview: Interview }) {
   const isPublished = interview.status === "published";
+  const href =
+    isPublished && interview.youtubeId
+      ? `https://www.youtube.com/watch?v=${interview.youtubeId}`
+      : null;
 
-  return (
-    <div className="group">
+  const card = (
+    <>
       <div className="relative aspect-video overflow-hidden rounded-lg bg-navy shadow-md transition-shadow duration-300 group-hover:shadow-xl">
         {interview.thumbnail ? (
           <Image
@@ -23,9 +27,11 @@ export default function InterviewCard({ interview }: { interview: Interview }) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/70 via-transparent to-transparent" />
 
-        <span className="absolute left-2 top-2 rounded-sm bg-broadcast px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide text-paper">
-          {interview.occupation.toUpperCase()}
-        </span>
+        {interview.occupation !== "Other" && (
+          <span className="absolute left-2 top-2 rounded-sm bg-broadcast px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide text-paper">
+            {interview.occupation.toUpperCase()}
+          </span>
+        )}
 
         <span className="absolute bottom-2 left-2 flex items-center gap-1.5 rounded bg-navy-deep/85 px-2 py-1 font-mono text-[11px] font-semibold text-paper">
           {isPublished ? (
@@ -45,6 +51,14 @@ export default function InterviewCard({ interview }: { interview: Interview }) {
           {interview.subject}
         </p>
       </div>
-    </div>
+    </>
+  );
+
+  return href ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
+      {card}
+    </a>
+  ) : (
+    <div className="group">{card}</div>
   );
 }

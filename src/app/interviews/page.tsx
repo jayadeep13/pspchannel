@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import RecBadge from "@/components/RecBadge";
 import InterviewsFilterGrid from "@/components/InterviewsFilterGrid";
-import { getInterviews } from "@/lib/interviews-store";
+import { getArchiveInterviews } from "@/lib/interviews-store";
 
 export const metadata: Metadata = {
   title: "Interviews & Episodes",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function InterviewsPage() {
-  const interviews = await getInterviews();
+  const interviews = await getArchiveInterviews();
 
   return (
     <>
